@@ -7,7 +7,7 @@
 using Offset = int64_t;
 using Pointer = char*;
 
-using BlockId = int32_t;
+using NodeId = int32_t;
 
 constexpr static int32_t Null = -1;
 
