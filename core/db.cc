@@ -17,21 +17,16 @@ DB::~DB() {
 }
 
 void DB::Get(const GetRequest& request, GetResponse* response) {
-    const char* ptr = &request.body[0] + request.db_len;
-    std::string_view key(ptr, request.key_len);
-    auto entry = skiplist_->Find(key);
-    if (!entry.Valid()) {
-        response->state = static_cast<int8_t>(State::kInvKey);
-        response->value_len = Null;
-    } else {
-        response->state = static_cast<int8_t>(State::kOK);
-        auto key = entry.GetKey();
-        auto value = entry.GetValue();
-        response->key_len = key.length();
-        response->value_len = value.length();
-        response->key = key.data();
-        response->value = value.data();
-    }
+    /*** [TODO]实现功能: 从存储系统中获取数据
+     * 提示：1. 从 request 中获取 key(db_name,key,value均存放在request.body，通过各自的 len 获取)，
+     *         这里需要了解一下柔性数组的用法
+     *      2. 从跳表中 Find 查询的 key, 检查返回的 entry 是否有效(entry.Valid())
+     *      3. 如果无效，将 response->state 置为 State::kInvKey(通过 static_cast 将其转换为 int8_t)
+     *      4. 如果有效，将 response->state 置为 State::kOK，并从 entry 中得到对应的key/value，
+     *         并赋值给 response 对应的字段
+     *   @param request Get 请求信息(定义见 core/message.h)
+     *   @param response Get 响应信息(定义见 core/message.h)
+    ***/
 }
 
 void DB::Put(const PutRequest& request, PutResponse* response) {

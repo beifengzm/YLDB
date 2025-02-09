@@ -12,7 +12,7 @@ struct Node {
 
 class NodePool {
     struct Header {
-        int32_t block_num;
+        int32_t node_num;
         int32_t first_free;
         int64_t file_size;
     };
@@ -20,15 +20,15 @@ class NodePool {
 public:
     explicit NodePool(std::string_view filename);
 
-    std::pair<BlockId, Node*> Alloc();
-    void Dealloc(BlockId block_id);
+    std::pair<NodeId, Node*> Alloc();
+    void Dealloc(NodeId node_id);
 
-    Node* GetNode(BlockId block_id);
+    Node* GetNode(NodeId node_id);
 
 private:
     void Expand();
-    char* GetAddress(BlockId block_id) const {
-        return data_ + sizeof(Header) + sizeof(Node) * block_id;
+    char* GetAddress(NodeId node_id) const {
+        return data_ + sizeof(Header) + sizeof(Node) * node_id;
     }
 
     int fd_;

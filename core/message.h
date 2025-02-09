@@ -29,24 +29,24 @@ struct MessageHead {
 };
 
 struct GetRequest {
-    int32_t db_len;
-    int32_t key_len;
+    int32_t db_len = 0;
+    int32_t key_len = 0;
     char body[];
 };
 
 struct GetResponse {
     int8_t state;
-    int32_t key_len;
-    int32_t value_len;
+    int32_t key_len = 0;
+    int32_t value_len = 0;
     const char* key;
     const char* value;
 };
 
 struct PutRequest {
     int8_t put_type;    // for PutType
-    int32_t db_len;
-    int32_t key_len;
-    int32_t value_len;
+    int32_t db_len = 0;
+    int32_t key_len = 0;
+    int32_t value_len = 0;
     char body[];
 };
 

@@ -89,20 +89,13 @@ void DBServer::Start() {
 }
 
 void DBServer::HandleGetRequest(const GetRequest& request) {
-    const char* data = &request.body[0];
-    std::string db_name(data, request.db_len);
-    GetResponse response;
-    auto iter = name2db_.find(db_name);
-    if (iter == name2db_.end()) {
-        response.state = static_cast<int8_t>(State::kInvDB);
-    } else {
-        iter->second->Get(request, &response);
-    }
-
-    int length = sizeof(int8_t) + sizeof(int32_t) * 2;
-    write(client_fd_, (const void*)&response, length);
-    write(client_fd_, response.key, response.key_len);
-    write(client_fd_, response.value, response.value_len);
+    /*** [TODO]实现功能: 处理 Get 请求
+     * 提示：1. 从 request 中获取 db_name
+     *      2. 检查 name2db_ 是否有对应的 db_name, 如果没有，将 response.state 置为 State::kInvDB
+     *      3. 如果有，则调用对应 db 的 Get 读取数据
+     *      4. 将 response 的发送到 client_fd_，注意，这里需考虑 response.key 和 response.value 如何发送
+     *   @param request Get 请求信息(定义见 core/message.h)
+    ***/
 }
 
 void DBServer::HandlePutRequest(const PutRequest& request) {

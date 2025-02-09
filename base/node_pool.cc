@@ -23,37 +23,44 @@ NodePool::NodePool(std::string_view filename) {
 
     header_ = reinterpret_cast<Header*>(data_);
     if (need_init) {
-        header_->block_num = 0;
-        header_->first_free = Null;
-        header_->file_size = sizeof(Header);
+        /*** [TODO]实现功能: 初始化 header_ 的各个成员，参考 base/data_pool.cc
+         * 提示：1. header_->node_num 表示 node 的数目
+         *      2. header_->first_free 表示当前空闲的 node id, 初始为 Null(定义在 base/common.h)
+         *      3. header_->file_size 为该 mmap 文件的大小，初始只存储了一个 Header
+        ***/
     }
 }
 
-std::pair<BlockId, Node*> NodePool::Alloc() {
-    if (header_->first_free == Null) Expand();
-
-    auto block_id = header_->first_free;
-    auto next_id = *reinterpret_cast<const int32_t*>(GetAddress(block_id));
-    header_->first_free = next_id;
-    return {block_id, GetNode(block_id)};
+std::pair<NodeId, Node*> NodePool::Alloc() {
+    /*** [TODO]实现功能: 分配一个空闲 node
+     * 提示：1. 先判断 header_->first_free 是否为 Null，如果是，则需要先扩展一个新 Node(调用 Expand)
+     *      2. 分配空闲链表上的第一个 node，并将 header_->first 置为链表上的下一个元素
+     *      3. 返回 node_id 和 Node 指针(需要用到 GetNode 函数)
+     *   @return 返回分配 node 的 node_id(node 对应的下标) 和 Node 指针
+    ***/
 }
 
-void NodePool::Dealloc(BlockId block_id) {
-    *reinterpret_cast<int32_t*>(GetAddress(block_id)) = header_->first_free;
-    header_->first_free = block_id;
+void NodePool::Dealloc(NodeId node_id) {
+    /*** [TODO]实现功能: 回收一个 node
+     * 提示：1. 先将该 node 的前 4 个字节置为 header_->first_free
+     *      2. 再将 header_->first_free 置为该 node_id
+     *   @param node_id 待回收的 node_id
+    ***/
+    *reinterpret_cast<int32_t*>(GetAddress(node_id)) = header_->first_free;
+    header_->first_free = node_id;
 }
 
-Node* NodePool::GetNode(BlockId block_id) {
-    if (block_id >= header_->block_num) return nullptr;
-    return reinterpret_cast<Node*>(GetAddress(block_id));
+Node* NodePool::GetNode(NodeId node_id) {
+    if (node_id >= header_->node_num) return nullptr;
+    return reinterpret_cast<Node*>(GetAddress(node_id));
 }
 
 void NodePool::Expand() {
     fallocate(fd_, 0, header_->file_size, sizeof(Node));
     header_->file_size += sizeof(Node);
-    header_->first_free = header_->block_num;
-    *reinterpret_cast<int32_t*>(GetAddress(header_->block_num)) = -1;
-    header_->block_num += 1;
+    header_->first_free = header_->node_num;
+    *reinterpret_cast<int32_t*>(GetAddress(header_->node_num)) = -1;
+    header_->node_num += 1;
 }
 
 } // namespace qsdb::base
